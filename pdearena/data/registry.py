@@ -45,6 +45,13 @@ from .twod.datapipes.shallowwater2d import (
     trajectory_valid_datapipe_2day_vel,
     trajectory_valid_datapipe_2day_vort,
 )
+from .twod.datapipes.temporal_dataset import (
+    onestep_test_datapipe_temporal,
+    onestep_valid_datapipe_temporal,
+    train_datapipe_temporal,
+    trajectory_test_datapipe_temporal,
+    trajectory_valid_datapipe_temporal,
+)
 
 DATAPIPE_REGISTRY = {}
 
@@ -111,3 +118,9 @@ DATAPIPE_REGISTRY["Maxwell3D"] = {}
 DATAPIPE_REGISTRY["Maxwell3D"]["train"] = train_datapipe_maxwell
 DATAPIPE_REGISTRY["Maxwell3D"]["valid"] = [onestep_valid_datapipe_maxwell, rollout_valid_datapipe_maxwell]
 DATAPIPE_REGISTRY["Maxwell3D"]["test"] = [onestep_test_datapipe_maxwell, rollout_test_datapipe_maxwell]
+
+# Temporal datasets from your griddataset.py
+DATAPIPE_REGISTRY["TemporalDataset2D"] = {}
+DATAPIPE_REGISTRY["TemporalDataset2D"]["train"] = train_datapipe_temporal
+DATAPIPE_REGISTRY["TemporalDataset2D"]["valid"] = [onestep_valid_datapipe_temporal, trajectory_valid_datapipe_temporal]
+DATAPIPE_REGISTRY["TemporalDataset2D"]["test"] = [onestep_test_datapipe_temporal, trajectory_test_datapipe_temporal]
