@@ -530,6 +530,7 @@ class Unet(nn.Module):
         param_conditioning: Optional[str] = None,
         use_scale_shift_norm: bool = False,
         use1x1: bool = False,
+        n_dims: int = 2,
     ) -> None:
         super().__init__()
         self.n_input_scalar_components = n_input_scalar_components

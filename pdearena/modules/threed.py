@@ -1,10 +1,7 @@
 from typing import Callable, Union
 
 import torch
-from cliffordlayers.models.basic.custom_layers import (
-    CliffordConv3dMaxwellDecoder,
-    CliffordConv3dMaxwellEncoder,
-)
+from cliffordlayers.models.models_3d import CliffordConv3dEncoder, CliffordConv3dDecoder
 from torch import nn
 from torch.nn import functional as F
 
@@ -247,14 +244,14 @@ class CliffordMaxwellResNet3D(nn.Module):
         super().__init__()
 
         # Encoding and decoding layers.
-        self.encoder = CliffordConv3dMaxwellEncoder(
+        self.encoder = CliffordConv3dEncoder(
             g,
             in_channels=time_history,
             out_channels=hidden_channels,
             kernel_size=1,
             padding=0,
         )
-        self.decoder = CliffordConv3dMaxwellDecoder(
+        self.decoder = CliffordConv3dDecoder(
             g,
             in_channels=hidden_channels,
             out_channels=time_future,

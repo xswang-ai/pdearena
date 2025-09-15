@@ -1,4 +1,4 @@
-from cliffordlayers.models.basic.threed import CliffordFourierBasicBlock3d
+from cliffordlayers.models.models_3d import CliffordFourierBasicBlock3d
 
 from pdearena import utils
 from pdearena.modules.conditioned.twod_resnet import (
@@ -12,6 +12,18 @@ from pdearena.modules.twod_resnet import (
 )
 
 MODEL_REGISTRY = {
+    "FNO-64-16m": {
+        "class_path": "pdearena.modules.twod_resnet.ResNet",
+        "init_args": {
+            "hidden_channels": 64,
+            "norm": False,
+            "num_blocks": [1, 1, 1, 1],
+            "block": utils.partialclass("CustomFourierBasicBlock", FourierBasicBlock, modes1=16, modes2=16),
+            "diffmode": False,
+            "usegrid": False,
+        },
+    },
+
     "FNO-128-8m": {
         "class_path": "pdearena.modules.twod_resnet.ResNet",
         "init_args": {
@@ -378,6 +390,18 @@ MODEL_REGISTRY = {
 }
 
 COND_MODEL_REGISTRY = {
+     "FNO-64-16m": {
+        "class_path": "pdearena.modules.conditioned.twod_resnet.ResNet",
+        "init_args": {
+            "hidden_channels": 64,
+            "norm": False,
+            "num_blocks": [1, 1, 1, 1],
+            "block": utils.partialclass("CustomFourierBasicBlock", CondFourierBasicBlock, modes1=16, modes2=16),
+            "diffmode": False,
+            "usegrid": False,
+        },
+    },
+    
     "FNO-128-16m": {
         "class_path": "pdearena.modules.conditioned.twod_resnet.ResNet",
         "init_args": {

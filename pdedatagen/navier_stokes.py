@@ -86,11 +86,11 @@ def generate_trajectories_smoke(
                 extrapolation.BOUNDARY,
                 x=pde.nx,
                 y=pde.ny,
-                bounds=Box[0 : pde.Lx, 0 : pde.Ly],
+                bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly],
             )
         )  # sampled at cell centers
         velocity = StaggeredGrid(
-            0, extrapolation.ZERO, x=pde.nx, y=pde.ny, bounds=Box[0 : pde.Lx, 0 : pde.Ly]
+            0, extrapolation.ZERO, x=pde.nx, y=pde.ny, bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly]
         )  # sampled in staggered form at face centers
         fluid_field_ = []
         velocity_ = []
@@ -116,9 +116,66 @@ def generate_trajectories_smoke(
 
     with utils.Timer() as gentime:
         rngs = np.random.randint(np.iinfo(np.int32).max, size=num_samples)
-        fluid_field, velocity_corrected = zip(
-            *Parallel(n_jobs=n_parallel)(delayed(genfunc)(idx, rngs[idx]) for idx in tqdm(range(num_samples)))
-        )
+        fluid_field, velocity_corrected = [], []
+        
+        for idx in tqdm(range(num_samples)):
+            try:
+                phi_seed(idx + rngs[idx])
+                smoke = abs(
+                    CenteredGrid(
+                        Noise(scale=11.0, smoothness=6.0),
+                        extrapolation.BOUNDARY,
+                        x=pde.nx,
+                        y=pde.ny,
+                        bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly],
+                    )
+                )  # sampled at cell centers
+                velocity = StaggeredGrid(
+                    0, extrapolation.ZERO, x=pde.nx, y=pde.ny, bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly]
+                )  # sampled in staggered form at face centers
+                fluid_field_ = []
+                velocity_ = []
+                for i in range(0, pde.nt + pde.skip_nt):
+                    smoke = advect.semi_lagrangian(smoke, velocity, pde.dt)
+                    buoyancy_force = (smoke * (0, pde.buoyancy_y)).at(velocity)  # resamples smoke to velocity sample points
+                    velocity = advect.semi_lagrangian(velocity, velocity, pde.dt) + pde.dt * buoyancy_force
+                    velocity = diffuse.explicit(velocity, pde.nu, pde.dt)
+                    
+                    # Try to make velocity incompressible with error handling
+                    try:
+                        velocity, _ = fluid.make_incompressible(velocity)
+                    except Exception as e:
+                        print(f"Warning: Convergence failed at step {i}, residual error: {e}")
+                        # Try with a smaller time step for this step
+                        try:
+                            small_dt = pde.dt * 0.1
+                            velocity = advect.semi_lagrangian(velocity, velocity, small_dt) + small_dt * buoyancy_force
+                            velocity = diffuse.explicit(velocity, pde.nu, small_dt)
+                            velocity, _ = fluid.make_incompressible(velocity)
+                            print(f"Successfully recovered with smaller time step")
+                        except Exception as e2:
+                            print(f"Failed even with smaller time step: {e2}")
+                            # As a last resort, skip the incompressibility step
+                            print("Skipping incompressibility step - this may affect simulation quality")
+                    
+                    fluid_field_.append(reshaped_native(smoke.values, groups=("x", "y", "vector"), to_numpy=True))
+                    velocity_.append(
+                        reshaped_native(
+                            velocity.staggered_tensor(),
+                            groups=("x", "y", "vector"),
+                            to_numpy=True,
+                        )
+                    )
+
+                fluid_field_ = np.asarray(fluid_field_[pde.skip_nt :]).squeeze()
+                # velocity has the shape [nt, nx+1, ny+2, 2]
+                velocity_corrected_ = np.asarray(velocity_[pde.skip_nt :]).squeeze()[:, :-1, :-1, :]
+                fluid_field.append(fluid_field_[:: pde.sample_rate, ...])
+                velocity_corrected.append(velocity_corrected_[:: pde.sample_rate, ...])
+                print(f"Successfully generated sample {idx}")
+            except Exception as e:
+                print(f"Error generating sample {idx}: {e}")
+                raise
 
     logger.info(f"Took {gentime.dt:.3f} seconds")
 

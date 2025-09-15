@@ -15,7 +15,7 @@ from pdearena.ema import ExponentialMovingAverage
 from pdearena.modules.loss import CustomMSELoss, PearsonCorrelationScore, ScaledLpLoss
 from pdearena.rollout import cond_rollout2d
 
-from .registry import COND_MODEL_REGISTRY
+from .registry import MODEL_REGISTRY, COND_MODEL_REGISTRY
 
 logger = utils.get_logger(__name__)
 
@@ -116,18 +116,21 @@ class PDERefiner(LightningModule):
 
     def train_step(self, batch):
         x, y, cond = batch
+        cond = None # SPECIFY cond to be none
         if self.hparams.predict_difference:
             # Predict difference to next step instead of next step directly.
             y = (y - x[:, -1:]) / self.hparams.difference_weight
-        k = torch.randint(0, self.scheduler.config.num_train_timesteps, (x.shape[0],), device=x.device)
+        k = torch.randint(0, self.scheduler.config.num_train_timesteps, (x.shape[0],), device=x.device) # sample a batch of timesteps from (0, K)
         noise_factor = self.scheduler.alphas_cumprod.to(x.device)[k]
         noise_factor = noise_factor.view(-1, *[1 for _ in range(x.ndim - 1)])
         signal_factor = 1 - noise_factor
         noise = torch.randn_like(y)
-        y_noised = self.scheduler.add_noise(y, noise, k)
-        x_in = torch.cat([x, y_noised], axis=1)
-        pred = self.model(x_in, time=k * self.time_multiplier, z=cond)
-        target = (noise_factor**0.5) * noise - (signal_factor**0.5) * y
+        y_noised = self.scheduler.add_noise(y, noise, k)  # get the noisy input (u_t + noise*noise_std in the paper pseudo code)
+        # x is the u_prev, y_noised is the u_t_noised in the paper pseudo code
+        x_in = torch.cat([x, y_noised], axis=1) # in the paper, self.neural_operator(u_t_noised, u_prev, k), here we concatenate u_prev and u_t_noised
+        pred = self.model(x_in, time=k * self.time_multiplier, z=cond) # there goes k to the neural operator
+        
+        target = (noise_factor**0.5) * noise - (signal_factor**0.5) * y # 
         loss = self.train_criterion(pred, target)
         return loss, pred, target
 
@@ -137,7 +140,7 @@ class PDERefiner(LightningModule):
         loss = {k: vc(pred, y) for k, vc in self.val_criterions.items()}
         return loss, pred, y
 
-    def predict_next_solution(self, x, cond):
+    def predict_next_solution(self, x, cond=None):
         y_noised = torch.randn(
             size=(x.shape[0], self.hparams.time_future, *x.shape[2:]), dtype=x.dtype, device=x.device
         )

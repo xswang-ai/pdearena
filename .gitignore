@@ -138,3 +138,9 @@ dmypy.json
 cython_debug/
 
 .vscode
+debug_data/test/data_0.hdf5
+debug_data/test/data_1.hdf5
+debug_data/test/data_2.hdf5
+debug_data/train/data_0.hdf5
+debug_data/train/data_1.hdf5
+debug_data/train/data_2.hdf5
