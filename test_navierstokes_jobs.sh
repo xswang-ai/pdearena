@@ -19,5 +19,5 @@ source $HOME/.venvs/pytorch/bin/activate
 
 
 python3 scripts/generate_data.py base=pdedatagen/configs/navierstokes2dsmoke.yaml \
-experiment=smoke mode=test samples=30 seed=0 pdeconfig.init_args.sample_rate=4 \
+experiment=smoke mode=test samples=30 seed=0000 pdeconfig.init_args.sample_rate=4 \
 dirname=pdearena_data/navierstokes/
