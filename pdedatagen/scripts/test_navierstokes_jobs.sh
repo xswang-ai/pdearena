@@ -8,7 +8,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks-per-node=1
 #SBATCH --account=OD-230881
-#SBATCH --cpus-per-task=9        # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --cpus-per-task=4        # cpu-cores per task (>1 if multi-threaded tasks)
 
 
 # module load numpy/2.0.0-py312
