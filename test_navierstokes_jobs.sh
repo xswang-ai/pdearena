@@ -18,10 +18,6 @@ module load parallel python
 source $HOME/.venvs/pytorch/bin/activate
 
 
-seeds=(0000)
-for SEED in ${seeds[*]};
-do
-    python3 scripts/generate_data.py base=pdedatagen/configs/navierstokes2dsmoke.yaml \
-    experiment=smoke mode=test samples=30 seed=$SEED pdeconfig.init_args.sample_rate=4 \
-    dirname=pdearena_data/navierstokes/
-done
+python3 scripts/generate_data.py base=pdedatagen/configs/navierstokes2dsmoke.yaml \
+experiment=smoke mode=test samples=30 seed=0000 pdeconfig.init_args.sample_rate=4 \
+dirname=pdearena_data/navierstokes/
