@@ -120,6 +120,7 @@ def generate_trajectories_smoke(
         
         for idx in tqdm(range(num_samples)):
             try:
+                print(f"Generating sample {idx}")
                 phi_seed(idx + rngs[idx])
                 smoke = abs(
                     CenteredGrid(
