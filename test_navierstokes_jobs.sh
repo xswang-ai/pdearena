@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script produces 5.2k training, 1.3k valid, and 1.3k test trajectories of the Navier-Stokes dataset.
 
-#SBATCH --time=00:50:00
+#SBATCH --time=00:20:00
 
 #SBATCH --mem=256gb
 #SBATCH --nodes=1
@@ -19,5 +19,5 @@ source $HOME/.venvs/pytorch/bin/activate
 
 
 python3 scripts/generate_data.py base=pdedatagen/configs/navierstokes2dsmoke.yaml \
-experiment=smoke mode=test samples=3 seed=197910 pdeconfig.init_args.sample_rate=4 \
+experiment=smoke mode=test samples=10 seed=197910 pdeconfig.init_args.sample_rate=4 \
 dirname=pdearena_data/navierstokes/
