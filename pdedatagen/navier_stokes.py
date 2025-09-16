@@ -178,13 +178,12 @@ def generate_trajectories_smoke(
     save_name = os.path.join(dirname, "_".join([pde_string, mode, str(seed), f"{pde.buoyancy_y:.5f}"]))
     if mode == "train":
         save_name = save_name + "_" + str(num_samples)
-    h5f = h5py.File("".join([save_name, ".h5"]), "a")
     # if file already exists, delete it
     if os.path.exists("".join([save_name, ".h5"])):
         os.remove("".join([save_name, ".h5"]))
         print(f"Deleted existing file {save_name}.h5")
+    h5f = h5py.File("".join([save_name, ".h5"]), "a")
     dataset = h5f.create_group(mode)
-
     tcoord, xcoord, ycoord, dt, dx, dy = {}, {}, {}, {}, {}, {}
     h5f_u, h5f_vx, h5f_vy = {}, {}, {}
 
