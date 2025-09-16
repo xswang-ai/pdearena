@@ -126,7 +126,7 @@ def generate_trajectories_smoke(
         rngs = np.random.randint(np.iinfo(np.int32).max, size=num_samples)
         fluid_field, velocity_corrected = [], []
         for idx in tqdm(range(num_samples)):
-            fluid_field_, velocity_corrected_ = genfunc(idx, rngs[idx])
+            fluid_field_, velocity_corrected_ = genfunc(idx, rngs[idx].item())
             fluid_field.append(fluid_field_)
             velocity_corrected.append(velocity_corrected_)
         
