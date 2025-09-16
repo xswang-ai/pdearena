@@ -85,7 +85,7 @@ def generate_trajectories_smoke(
     def genfunc(idx, s):
         # new_seed = idx + int(s)
         # print('new_seed type: ', type(new_seed))
-        print(new_seed)
+        # print(new_seed)
         new_seed = idx
         phi_seed(new_seed)
         smoke = abs(
