@@ -1,14 +1,14 @@
 #!/bin/bash
 # This script produces 5.2k training, 1.3k valid, and 1.3k test trajectories of the Navier-Stokes dataset.
 
-#SBATCH --time=00:10:00
+#SBATCH --time=00:50:00
 
 #SBATCH --mem=256gb
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks-per-node=1
 #SBATCH --account=OD-230881
-#SBATCH --cpus-per-task=4        # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --cpus-per-task=8       # cpu-cores per task (>1 if multi-threaded tasks)
 
 
 # module load numpy/2.0.0-py312
