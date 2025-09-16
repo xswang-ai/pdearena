@@ -83,27 +83,19 @@ def generate_trajectories_smoke(
     buo_y = dataset.create_dataset("buo_y", (num_samples,), dtype=float)
 
     def genfunc(idx, s):
-        # new_seed = idx + int(s)
-        # print('new_seed type: ', type(new_seed))
-        # print(new_seed)
-        try:
-            # new_seed = 0
-            # phi_seed(new_seed)
-            smoke = abs(
-                CenteredGrid(
-                    Noise(scale=11.0, smoothness=6.0),
-                    extrapolation.BOUNDARY,
-                    x=pde.nx,
-                    y=pde.ny,
-                    bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly],
-                )
-            )  # sampled at cell centers
-            velocity = StaggeredGrid(
-                0, extrapolation.ZERO, x=pde.nx, y=pde.ny, bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly]
-            )  # sampled in staggered form at face centers
-        except Exception as e:
-            print(f"Error generating sample {idx}: {e}")
-            raise
+        phi_seed(idx + s)
+        smoke = abs(
+            CenteredGrid(
+                Noise(scale=11.0, smoothness=6.0),
+                extrapolation.BOUNDARY,
+                x=pde.nx,
+                y=pde.ny,
+                bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly],
+            )
+        )  # sampled at cell centers
+        velocity = StaggeredGrid(
+            0, extrapolation.ZERO, x=pde.nx, y=pde.ny, bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly]
+        )  # sampled in staggered form at face centers
         fluid_field_ = []
         velocity_ = []
         for i in range(0, pde.nt + pde.skip_nt):
@@ -128,9 +120,15 @@ def generate_trajectories_smoke(
 
     with utils.Timer() as gentime:
         rngs = np.random.randint(np.iinfo(np.int32).max, size=num_samples)
-        fluid_field, velocity_corrected = zip(
-            *Parallel(n_jobs=n_parallel)(delayed(genfunc)(idx, rngs[idx]) for idx in tqdm(range(num_samples)))
-        )
+        fluid_field, velocity_corrected = [], []
+        for idx in tqdm(range(num_samples)):
+            fluid_field_, velocity_corrected_ = genfunc(idx, rngs[idx])
+            fluid_field.append(fluid_field_)
+            velocity_corrected.append(velocity_corrected_)
+        
+        # fluid_field, velocity_corrected = zip(
+            # *Parallel(n_jobs=n_parallel)(delayed(genfunc)(idx, rngs[idx]) for idx in tqdm(range(num_samples)))
+        # )
 
     logger.info(f"Took {gentime.dt:.3f} seconds")
 
