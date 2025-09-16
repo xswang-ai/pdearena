@@ -83,10 +83,11 @@ def generate_trajectories_smoke(
     buo_y = dataset.create_dataset("buo_y", (num_samples,), dtype=float)
 
     def genfunc(idx, s):
-        new_seed = idx + int(s)
-        print('new_seed type: ', type(new_seed))
+        # new_seed = idx + int(s)
+        # print('new_seed type: ', type(new_seed))
         print(new_seed)
-        phi_seed(int(new_seed))
+        new_seed = idx
+        phi_seed(new_seed)
         smoke = abs(
             CenteredGrid(
                 Noise(scale=11.0, smoothness=6.0),
