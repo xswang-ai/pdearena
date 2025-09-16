@@ -86,20 +86,24 @@ def generate_trajectories_smoke(
         # new_seed = idx + int(s)
         # print('new_seed type: ', type(new_seed))
         # print(new_seed)
-        new_seed = idx
-        phi_seed(new_seed)
-        smoke = abs(
-            CenteredGrid(
-                Noise(scale=11.0, smoothness=6.0),
-                extrapolation.BOUNDARY,
-                x=pde.nx,
-                y=pde.ny,
-                bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly],
-            )
-        )  # sampled at cell centers
-        velocity = StaggeredGrid(
-            0, extrapolation.ZERO, x=pde.nx, y=pde.ny, bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly]
-        )  # sampled in staggered form at face centers
+        try:
+            new_seed = 0
+            phi_seed(new_seed)
+            smoke = abs(
+                CenteredGrid(
+                    Noise(scale=11.0, smoothness=6.0),
+                    extrapolation.BOUNDARY,
+                    x=pde.nx,
+                    y=pde.ny,
+                    bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly],
+                )
+            )  # sampled at cell centers
+            velocity = StaggeredGrid(
+                0, extrapolation.ZERO, x=pde.nx, y=pde.ny, bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly]
+            )  # sampled in staggered form at face centers
+        except Exception as e:
+            print(f"Error generating sample {idx}: {e}")
+            raise
         fluid_field_ = []
         velocity_ = []
         for i in range(0, pde.nt + pde.skip_nt):
