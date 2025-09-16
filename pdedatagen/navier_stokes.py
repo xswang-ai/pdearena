@@ -116,6 +116,11 @@ def generate_trajectories_smoke(
 
     with utils.Timer() as gentime:
         rngs = np.random.randint(np.iinfo(np.int32).max, size=num_samples)
+        for idx in tqdm(range(num_samples)):
+            print('idx type: ', type(idx))
+            print(f"Generating sample {idx}")
+            print('rngs[idx] type: ', type(rngs[idx]))
+            print(rngs[idx])
         fluid_field, velocity_corrected = zip(
             *Parallel(n_jobs=n_parallel)(delayed(genfunc)(idx, rngs[idx]) for idx in tqdm(range(num_samples)))
         )
