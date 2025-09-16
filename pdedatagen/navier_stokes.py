@@ -87,8 +87,8 @@ def generate_trajectories_smoke(
         # print('new_seed type: ', type(new_seed))
         # print(new_seed)
         try:
-            new_seed = 0
-            phi_seed(new_seed)
+            # new_seed = 0
+            # phi_seed(new_seed)
             smoke = abs(
                 CenteredGrid(
                     Noise(scale=11.0, smoothness=6.0),
