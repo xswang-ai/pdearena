@@ -86,7 +86,7 @@ def generate_trajectories_smoke(
                 extrapolation.BOUNDARY,
                 x=pde.nx,
                 y=pde.ny,
-                bounds=Box[0 : pde.Lx, 0 : pde.Ly],
+                bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly],
             )
         )  # sampled at cell centers
         velocity = StaggeredGrid(
