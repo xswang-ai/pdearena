@@ -83,6 +83,8 @@ def generate_trajectories_smoke(
     buo_y = dataset.create_dataset("buo_y", (num_samples,), dtype=float)
 
     def genfunc(idx, s):
+        print("idx", idx, "idx type", type(idx))
+        print("s", s, "s type", type(s))
         phi_seed(idx + s)
         smoke = abs(
             CenteredGrid(
@@ -120,6 +122,7 @@ def generate_trajectories_smoke(
 
     with utils.Timer() as gentime:
         rngs = np.random.randint(np.iinfo(np.int32).max, size=num_samples)
+        print("rngs", rngs, "rngs type", type(rngs),  rngs  [0].item(), "rngs[0] type", type(rngs[0].item()))
         fluid_field, velocity_corrected = zip(
             *Parallel(n_jobs=n_parallel)(delayed(genfunc)(idx, rngs[idx].item()) for idx in tqdm(range(num_samples)))
         )
