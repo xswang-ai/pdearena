@@ -2,8 +2,6 @@
 # Licensed under the MIT license.
 import logging
 import os
-import warnings
-warnings.filterwarnings("ignore")
 import h5py
 import numpy as np
 import torch
@@ -124,9 +122,11 @@ def generate_trajectories_smoke(
     with utils.Timer() as gentime:
         rngs = np.random.randint(np.iinfo(np.int32).max, size=num_samples)
         # print("rngs", rngs, "rngs type", type(rngs),  rngs  [0].item(), "rngs[0] type", type(rngs[0].item()))
-        fluid_field, velocity_corrected = zip(
-            *Parallel(n_jobs=n_parallel)(delayed(genfunc)(idx, rngs[idx].item()) for idx in tqdm(range(num_samples)))
-        )
+        # fluid_field, velocity_corrected = zip(
+        #     *Parallel(n_jobs=n_parallel)(delayed(genfunc)(idx, rngs[idx].item()) for idx in tqdm(range(num_samples)))
+        # )
+        for idx in range(num_samples):
+            fluid_field, velocity_corrected = genfunc(idx, rngs[idx].item())
 
     logger.info(f"Took {gentime.dt:.3f} seconds")
 
