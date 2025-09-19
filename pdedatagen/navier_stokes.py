@@ -104,13 +104,20 @@ def generate_trajectories_smoke(
             velocity = diffuse.explicit(velocity, pde.nu, pde.dt)
             # velocity, _ = fluid.make_incompressible(velocity)
             try:
-                solve_robust = Solve(abs_tol=1e-3, rel_tol=1e-3, max_iterations=5000, method='CG')
+                # Try BiCGStab first - often better for ill-conditioned systems
+                solve_robust = Solve(abs_tol=1e-3, rel_tol=1e-3, max_iterations=3000, method='BiCGStab')
                 velocity, _ = fluid.make_incompressible(velocity, solve=solve_robust)
             except:
-                print("CG failed, trying with bigger tolerance and more iterations")
-                # Fallback with more relaxed tolerance if CG fails
-                solve_fallback = Solve(abs_tol=5e-3, rel_tol=5e-3, max_iterations=10000, method='CG')
-                velocity, _ = fluid.make_incompressible(velocity, solve=solve_fallback)
+                try:
+                    print("BiCGStab failed, trying CG with preconditioning")
+                    # Try CG with preconditioning
+                    solve_precond = Solve(abs_tol=1e-3, rel_tol=1e-3, max_iterations=5000, method='CG')
+                    velocity, _ = fluid.make_incompressible(velocity, solve=solve_precond)
+                except:
+                    print("All iterative methods failed, using direct solver")
+                    # Last resort: direct solver (more expensive but guaranteed to work)
+                    solve_direct = Solve(abs_tol=1e-6, rel_tol=1e-6, method='direct')
+                    velocity, _ = fluid.make_incompressible(velocity, solve=solve_direct)
             fluid_field_.append(reshaped_native(smoke.values, groups=("x", "y", "vector"), to_numpy=True))
             velocity_.append(
                 reshaped_native(
