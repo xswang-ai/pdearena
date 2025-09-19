@@ -103,8 +103,14 @@ def generate_trajectories_smoke(
             velocity = advect.semi_lagrangian(velocity, velocity, pde.dt) + pde.dt * buoyancy_force
             velocity = diffuse.explicit(velocity, pde.nu, pde.dt)
             # velocity, _ = fluid.make_incompressible(velocity)
-            solve_robust = Solve(abs_tol=5e-4, rel_tol=5e-4, max_iterations=5000, method='CG')
-            velocity, _ = fluid.make_incompressible(velocity, solve=solve_robust)
+            try:
+                solve_robust = Solve(abs_tol=1e-3, rel_tol=1e-3, max_iterations=5000, method='CG')
+                velocity, _ = fluid.make_incompressible(velocity, solve=solve_robust)
+            except:
+                print("CG failed, trying with bigger tolerance and more iterations")
+                # Fallback with more relaxed tolerance if CG fails
+                solve_fallback = Solve(abs_tol=5e-3, rel_tol=5e-3, max_iterations=10000, method='CG')
+                velocity, _ = fluid.make_incompressible(velocity, solve=solve_fallback)
             fluid_field_.append(reshaped_native(smoke.values, groups=("x", "y", "vector"), to_numpy=True))
             velocity_.append(
                 reshaped_native(
