@@ -1,0 +1,26 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+            "base=pdedatagen/configs/navierstokes2dsmoke.yaml",
+            "experiment=smoke",
+            "mode=test",
+            "samples=2",
+            "seed=197910",
+            "pdeconfig.init_args.sample_rate=4",
+            "dirname=pdearena_data/navierstokes/",
+            "dirname=pdearena_data/navierstokes/",
+        ]
+        }
+    ]
+}

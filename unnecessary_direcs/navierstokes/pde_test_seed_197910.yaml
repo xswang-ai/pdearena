@@ -1,0 +1,19 @@
+class_path: pdedatagen.pde.NavierStokes2D
+init_args:
+  tmin: 18.0
+  tmax: 102.0
+  Lx: 32.0
+  Ly: 32.0
+  nt: 56
+  nx: 128
+  ny: 128
+  skip_nt: 8
+  sample_rate: 4
+  nu: 0.01
+  buoyancy_y: 0.5
+  correction_strength: 1.0
+  force_strength: 1.0
+  force_frequency: 4
+  n_scalar_components: 1
+  n_vector_components: 1
+  device: cpu
