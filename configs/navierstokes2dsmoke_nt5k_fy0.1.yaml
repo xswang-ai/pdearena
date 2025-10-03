@@ -21,7 +21,7 @@ pdeconfig:
     n_scalar_components: 1
     n_vector_components: 1
     device: cpu
-    parallel: 8
+parallel: 8
 samples: 32
 batchsize: 8
 seed: 42
