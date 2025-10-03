@@ -20,7 +20,7 @@ pdeconfig:
     force_frequency: 4
     n_scalar_components: 1
     n_vector_components: 1
-    device: cuda
+    device: cpu
 samples: 32
 batchsize: 8
 seed: 42
