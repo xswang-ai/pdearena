@@ -5,7 +5,7 @@
 
 #SBATCH --mem=256gb
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:4
 #SBATCH --ntasks-per-node=1
 #SBATCH --account=OD-230881
 #SBATCH --cpus-per-task=8       # cpu-cores per task (>1 if multi-threaded tasks)
@@ -18,6 +18,9 @@ module load parallel python
 source $HOME/.venvs/pytorch/bin/activate
 
 
-python3 scripts/generate_data.py base=pdedatagen/configs/navierstokes2dsmoke.yaml \
-experiment=smoke mode=test samples=2 seed=197910 pdeconfig.init_args.sample_rate=1 \
-dirname=pdearena_data/navierstokes/
+python3 generate_data.py base=configs/navierstokes2dsmoke_nt5k_fy0.1.yaml  experiment=smoke mode=train samples=5000 seed=197910 \
+dirname=/scratch3/wan410/operator_learning_data/pdearena/NSE-2D-Customised
+
+# python3 generate_data.py base=configs/navierstokes2dsmoke_nt5k_fy0.1.yaml \
+# experiment=smoke mode=train samples=5000 seed=197910 pdeconfig.init_args.device=cpu\
+# dirname=/scratch3/wan410/operator_learning_data/pdearena/NSE-2D-Customised

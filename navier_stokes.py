@@ -2,6 +2,7 @@
 # Licensed under the MIT license.
 import logging
 import os
+
 import h5py
 import numpy as np
 import torch
@@ -16,13 +17,13 @@ from phi.flow import (  # SoftGeometryMask,; Sphere,; batch,; tensor,
     extrapolation,
     fluid,
 )
-from phi.math import reshaped_native, Solve
+from phi.math import reshaped_native
 from phi.math import seed as phi_seed
 from tqdm import tqdm
 
-from pdearena import utils
+import utils
 
-from .pde import PDEConfig
+from pde import PDEConfig
 
 logger = logging.getLogger(__name__)
 
@@ -57,10 +58,10 @@ def generate_trajectories_smoke(
     save_name = os.path.join(dirname, "_".join([pde_string, mode, str(seed), f"{pde.buoyancy_y:.5f}"]))
     if mode == "train":
         save_name = save_name + "_" + str(num_samples)
-    # if file already exists, delete it
     if os.path.exists("".join([save_name, ".h5"])):
+        # delete the file
+        print(f"Deleting file {save_name}.h5")
         os.remove("".join([save_name, ".h5"]))
-        print(f"Deleted existing file {save_name}.h5")
     h5f = h5py.File("".join([save_name, ".h5"]), "a")
     dataset = h5f.create_group(mode)
 
@@ -97,34 +98,12 @@ def generate_trajectories_smoke(
         )  # sampled in staggered form at face centers
         fluid_field_ = []
         velocity_ = []
-        for i in range(0, pde.nt + pde.skip_nt):
+        for i in tqdm(range(0, pde.nt + pde.skip_nt)):
             smoke = advect.semi_lagrangian(smoke, velocity, pde.dt)
             buoyancy_force = (smoke * (0, pde.buoyancy_y)).at(velocity)  # resamples smoke to velocity sample points
             velocity = advect.semi_lagrangian(velocity, velocity, pde.dt) + pde.dt * buoyancy_force
             velocity = diffuse.explicit(velocity, pde.nu, pde.dt)
-            # velocity, _ = fluid.make_incompressible(velocity)
-            try:
-                # Try BiCGStab first - often better for ill-conditioned systems
-                solve_robust = Solve(abs_tol=1e-3, rel_tol=1e-3, max_iterations=3000, method='BiCGStab')
-                velocity, _ = fluid.make_incompressible(velocity, solve=solve_robust)
-            except:
-                try:
-                    print("BiCGStab failed, trying CG with relaxed tolerance")
-                    # Try CG with more relaxed tolerance
-                    solve_precond = Solve(abs_tol=5e-3, rel_tol=5e-3, max_iterations=5000, method='CG')
-                    velocity, _ = fluid.make_incompressible(velocity, solve=solve_precond)
-                except:
-                    try:
-                        print("CG failed, trying direct solver with relaxed tolerance")
-                        # Direct solver with relaxed tolerance
-                        solve_direct = Solve(abs_tol=1e-2, rel_tol=1e-2, method='direct')
-                        velocity, _ = fluid.make_incompressible(velocity, solve=solve_direct)
-                    except Exception as e:
-                        print(f"All solvers failed: {e}")
-                        print("Using velocity without incompressibility correction (may have divergence)")
-                        # Last resort: skip incompressibility correction entirely
-                        # This will allow the simulation to continue but with potential divergence
-                        pass
+            velocity, _ = fluid.make_incompressible(velocity)
             fluid_field_.append(reshaped_native(smoke.values, groups=("x", "y", "vector"), to_numpy=True))
             velocity_.append(
                 reshaped_native(
@@ -142,11 +121,13 @@ def generate_trajectories_smoke(
     with utils.Timer() as gentime:
         rngs = np.random.randint(np.iinfo(np.int32).max, size=num_samples)
         # print("rngs", rngs, "rngs type", type(rngs),  rngs  [0].item(), "rngs[0] type", type(rngs[0].item()))
-        # fluid_field, velocity_corrected = zip(
-        #     *Parallel(n_jobs=n_parallel)(delayed(genfunc)(idx, rngs[idx].item()) for idx in tqdm(range(num_samples)))
-        # )
-        for idx in range(num_samples):
-            fluid_field, velocity_corrected = genfunc(idx, rngs[idx].item())
+        if torch.cuda.is_available():
+            fluid_field, velocity_corrected = zip(
+                *Parallel(n_jobs=n_parallel)(delayed(genfunc)(idx, rngs[idx].item()) for idx in tqdm(range(num_samples)))
+            )
+        else:
+            for idx in tqdm(range(num_samples)):
+                fluid_field, velocity_corrected = genfunc(idx, rngs[idx].item())
 
     logger.info(f"Took {gentime.dt:.3f} seconds")
 
