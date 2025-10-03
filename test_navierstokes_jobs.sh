@@ -16,7 +16,3 @@ source $HOME/.venvs/pytorch/bin/activate
 
 python3 generate_data.py base=configs/navierstokes2dsmoke_nt5k_fy0.1.yaml  experiment=smoke mode=train samples=5000 seed=197910 \
 dirname=/scratch3/wan410/operator_learning_data/pdearena/NSE-2D-Customised
-
-# python3 generate_data.py base=configs/navierstokes2dsmoke_nt5k_fy0.1.yaml \
-# experiment=smoke mode=train samples=5000 seed=197910 pdeconfig.init_args.device=cpu\
-# dirname=/scratch3/wan410/operator_learning_data/pdearena/NSE-2D-Customised
