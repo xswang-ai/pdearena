@@ -32,10 +32,10 @@ MODE2SEED = {
 
 def main(cfg):
     seed = cfg.seed + MODE2SEED[cfg.mode]
-    if "parallel" not in cfg and cfg.pdeconfig.init_args.device == "cpu":
-        cfg.parallel = _safe_cpucount() // 2 + _safe_cpucount() // 4
-    else:
-        cfg.parallel = 1
+    # if "parallel" not in cfg and cfg.pdeconfig.init_args.device == "cpu":
+        # cfg.parallel = _safe_cpucount() // 2 + _safe_cpucount() // 4
+    # else:
+        # cfg.parallel = 1
 
     seed_everything(seed)
     os.makedirs(cfg.dirname, exist_ok=True)
