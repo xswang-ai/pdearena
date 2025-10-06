@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 def load_sample(sample_path):
     var_list = ['u', 'vx', 'vy']
     with h5py.File(sample_path, 'r') as f:
-        sample = {var: f[var][0] for var in var_list}
+        sample = {var: f[var] for var in var_list}
         print("sample u .shape", sample['u'].shape)
         print("sample vx.shape", sample['vx'].shape)
         print("sample vy.shape", sample['vy'].shape)
