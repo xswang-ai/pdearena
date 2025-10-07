@@ -39,6 +39,7 @@ def generate_trajectories_smoke(
     n_parallel: int = 1,
     seed: int = 42,
     tol: float = 1e-5,
+    start_sample: int = 0,
 ) -> None:
     """
     Generate data trajectories for smoke inflow in bounded domain
@@ -62,14 +63,14 @@ def generate_trajectories_smoke(
     if mode == "train":
         save_name = save_name + "_" + str(num_samples)
     
-    # Check which samples already exist
+    # Check which samples already exist (accounting for start_sample offset)
     existing_samples = []
-    for idx in range(num_samples):
+    for idx in range(start_sample, start_sample + num_samples):
         sample_filename = f"{save_name}_sample_{idx:06d}.h5"
         if os.path.exists(sample_filename):
             existing_samples.append(idx)
     
-    samples_to_generate = [idx for idx in range(num_samples) if idx not in existing_samples]
+    samples_to_generate = [idx for idx in range(start_sample, start_sample + num_samples) if idx not in existing_samples]
     
     if not samples_to_generate:
         logger.info(f"All {num_samples} samples already exist. Nothing to do.")
