@@ -58,7 +58,7 @@ def generate_trajectories_smoke(
     logger.info(f"Number of samples: {num_samples}")
     logger.info(f"Device: {device}")
     logger.info(f"Parallel: {n_parallel}")
-    save_name = os.path.join(dirname, "_".join([pde_string, mode, str(seed), f"{pde.buoyancy_y:.5f}"]))
+    save_name = os.path.join(dirname, "_".join([pde_string, mode, str(seed), f"{pde.buoyancy_y:.5f}"], f"tol{tol:.5f}"+"_" + "nt" + str(pde.nt)))
     if mode == "train":
         save_name = save_name + "_" + str(num_samples)
     
