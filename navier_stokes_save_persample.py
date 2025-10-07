@@ -142,7 +142,7 @@ def generate_trajectories_smoke(
         # Generate random seeds only for the samples we need to create
         rngs = np.random.randint(np.iinfo(np.int32).max, size=len(samples_to_generate))
         # print("rngs", rngs, "rngs type", type(rngs),  rngs  [0].item(), "rngs[0] type", type(rngs[0].item()))
-        if torch.cuda.is_available() or n_parallel > 1:
+        if torch.cuda.is_available():
             Parallel(n_jobs=n_parallel)(delayed(genfunc)(idx, rngs[i].item()) for i, idx in enumerate(tqdm(samples_to_generate)))
         else:
             for i, idx in enumerate(tqdm(samples_to_generate)):
