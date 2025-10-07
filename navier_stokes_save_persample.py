@@ -118,7 +118,7 @@ def generate_trajectories_smoke(
                 # Convert any exception to a simple string to avoid serialization issues
                 print(f"Error at step {i} (tol={tol:.1e}): {str(e)}")
                 # Use a fallback tolerance that's more likely to converge
-                fallback_tol = max(tol * 10, 1e-3)  # At least 1e-3
+                fallback_tol = min(tol * 10, 1e-3)  # At least 1e-3
                 try:
                     velocity, info = fluid.make_incompressible(velocity, solve=Solve(rel_tol=fallback_tol))
                     print(f"Step {i}: Fallback succeeded with tol={fallback_tol:.1e}")
