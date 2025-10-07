@@ -12,12 +12,11 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-            "base=configs/navierstokes2dsmoke_nt.yaml",
+            "base=configs/navierstokes2dsmoke_nt5k_fy0.1.yaml",
             "experiment=smoke",
-            "mode=test",
+            "mode=train",
             "samples=2",
             "seed=197910",
-            "pdeconfig.init_args.sample_rate=4",
             "dirname=pdearena_data/navierstokes/",
             "dirname=pdearena_data/navierstokes/",
         ]

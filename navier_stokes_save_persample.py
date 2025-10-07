@@ -19,6 +19,7 @@ from phi.flow import (  # SoftGeometryMask,; Sphere,; batch,; tensor,
 )
 from phi.math import reshaped_native
 from phi.math import seed as phi_seed
+from phi.math import Solve
 from tqdm import tqdm
 
 import utils
@@ -98,7 +99,7 @@ def generate_trajectories_smoke(
             buoyancy_force = (smoke * (0, pde.buoyancy_y)).at(velocity)  # resamples smoke to velocity sample points
             velocity = advect.semi_lagrangian(velocity, velocity, pde.dt) + pde.dt * buoyancy_force
             velocity = diffuse.explicit(velocity, pde.nu, pde.dt)
-            velocity, _ = fluid.make_incompressible(velocity)
+            velocity, _ = fluid.make_incompressible(velocity, solve=Solve(rel_tol=1e-3))
             fluid_field_.append(reshaped_native(smoke.values, groups=("x", "y", "vector"), to_numpy=True))
             velocity_.append(
                 reshaped_native(
