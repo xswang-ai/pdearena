@@ -79,15 +79,6 @@ def generate_trajectories_smoke(
 
     nt, nx, ny = pde.grid_size[0], pde.grid_size[1], pde.grid_size[2]
 
-    def genfunc_wrapper(idx, s):
-        """Wrapper to ensure clean return values for parallel processing"""
-        try:
-            return genfunc(idx, s)
-        except Exception as e:
-            print(f"Sample {idx} failed completely: {str(e)}")
-            # Return dummy data to keep the parallel processing going
-            return None, None
-    
     def genfunc(idx, s):
         phi_seed(idx + s)
         smoke = abs(
@@ -110,22 +101,7 @@ def generate_trajectories_smoke(
             buoyancy_force = (smoke * (0, pde.buoyancy_y)).at(velocity)  # resamples smoke to velocity sample points
             velocity = advect.semi_lagrangian(velocity, velocity, pde.dt) + pde.dt * buoyancy_force
             velocity = diffuse.explicit(velocity, pde.nu, pde.dt)
-            try:
-                velocity, info = fluid.make_incompressible(velocity, solve=Solve(rel_tol=tol))
-                if not info.converged:
-                    print(f"Warning: Step {i} did not converge (tol={tol:.1e}), but continuing...")
-            except Exception as e:
-                # Convert any exception to a simple string to avoid serialization issues
-                print(f"Error at step {i} (tol={tol:.1e}): {str(e)}")
-                # Use a fallback tolerance that's more likely to converge
-                fallback_tol = min(tol * 10, 1e-3)  # At least 1e-3
-                try:
-                    velocity, info = fluid.make_incompressible(velocity, solve=Solve(rel_tol=fallback_tol))
-                    print(f"Step {i}: Fallback succeeded with tol={fallback_tol:.1e}")
-                except Exception as e2:
-                    print(f"Critical: Step {i} failed even with fallback tol={fallback_tol:.1e}: {str(e2)}")
-                    # Continue without incompressibility correction
-                    pass
+            velocity, _ = fluid.make_incompressible(velocity, solve=Solve(rel_tol=tol))
             fluid_field_.append(reshaped_native(smoke.values, groups=("x", "y", "vector"), to_numpy=True))
             velocity_.append(
                 reshaped_native(
@@ -162,15 +138,11 @@ def generate_trajectories_smoke(
         # Generate random seeds only for the samples we need to create
         rngs = np.random.randint(np.iinfo(np.int32).max, size=len(samples_to_generate))
         # print("rngs", rngs, "rngs type", type(rngs),  rngs  [0].item(), "rngs[0] type", type(rngs[0].item()))
-        if torch.cuda.is_available():
-            results = Parallel(n_jobs=n_parallel)(delayed(genfunc_wrapper)(idx, rngs[i].item()) for i, idx in enumerate(tqdm(samples_to_generate)))
-            # Check for failed samples
-            failed_samples = [samples_to_generate[i] for i, result in enumerate(results) if result[0] is None]
-            if failed_samples:
-                print(f"Warning: {len(failed_samples)} samples failed: {failed_samples}")
+        if not torch.cuda.is_available():
+            Parallel(n_jobs=n_parallel)(delayed(genfunc)(idx, rngs[i].item()) for i, idx in enumerate(tqdm(samples_to_generate)))
         else:
             for i, idx in enumerate(tqdm(samples_to_generate)):
-                genfunc_wrapper(idx, rngs[i].item())
+                genfunc(idx, rngs[i].item())
 
     logger.info(f"Took {gentime.dt:.3f} seconds")
 
