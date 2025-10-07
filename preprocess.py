@@ -40,6 +40,7 @@ def generate_gt_gif(sample_data, log_path=None):
         titles[key] =ax[i].set_title(key + ' T=0')
 
     def update(frame_idx):
+        print("frame_idx", frame_idx)
         for i, key in enumerate(keys):
             data_c = sample_data[key]
             vmax = np.max(np.abs(data_c))
@@ -48,7 +49,7 @@ def generate_gt_gif(sample_data, log_path=None):
             titles[key].set_title(key + ' T=' + str(frame_idx))
         return imgs, titles
 
-    anim = FuncAnimation(fig, update, frames=data_c.shape[0], interval=200, blit=False)
+    anim = FuncAnimation(fig, update, frames=data_c.shape[0]-1, interval=200, blit=False)
 
     gif_path = f'{log_path}/sample_{sample_id}.gif'
     try:
