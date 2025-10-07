@@ -38,6 +38,7 @@ def generate_trajectories_smoke(
     dirname: str = "data",
     n_parallel: int = 1,
     seed: int = 42,
+    tol: float = 1e-5,
 ) -> None:
     """
     Generate data trajectories for smoke inflow in bounded domain
@@ -99,7 +100,7 @@ def generate_trajectories_smoke(
             buoyancy_force = (smoke * (0, pde.buoyancy_y)).at(velocity)  # resamples smoke to velocity sample points
             velocity = advect.semi_lagrangian(velocity, velocity, pde.dt) + pde.dt * buoyancy_force
             velocity = diffuse.explicit(velocity, pde.nu, pde.dt)
-            velocity, _ = fluid.make_incompressible(velocity, solve=Solve(rel_tol=5e-4))
+            velocity, _ = fluid.make_incompressible(velocity, solve=Solve(rel_tol=tol))
             fluid_field_.append(reshaped_native(smoke.values, groups=("x", "y", "vector"), to_numpy=True))
             velocity_.append(
                 reshaped_native(
