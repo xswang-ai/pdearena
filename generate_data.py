@@ -62,7 +62,7 @@ def main(cfg):
             dirname=cfg.dirname,
             n_parallel=cfg.parallel,
             seed=seed,
-            tol=cfg.pdeconfig.init_args.solve_rel_tol,
+            tol=cfg.solve_rel_tol,
         )
     elif cfg.experiment == "smoke_cond":
         bfys = np.random.uniform(0.2, 0.5, size=cfg.samples // 32)

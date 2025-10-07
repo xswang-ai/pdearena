@@ -21,7 +21,7 @@ pdeconfig:
     n_scalar_components: 1
     n_vector_components: 1
     device: cpu
-    solve_rel_tol: 1e-3
+solve_rel_tol: 1e-3
 parallel: 8
 samples: 2
 batchsize: 8
