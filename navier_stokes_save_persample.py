@@ -39,7 +39,6 @@ def generate_trajectories_smoke(
     n_parallel: int = 1,
     seed: int = 42,
     tol: float = 1e-5,
-    start_sample: int = 0,
 ) -> None:
     """
     Generate data trajectories for smoke inflow in bounded domain
@@ -63,14 +62,14 @@ def generate_trajectories_smoke(
     if mode == "train":
         save_name = save_name + "_" + str(num_samples)
     
-    # Check which samples already exist (accounting for start_sample offset)
+    # Check which samples already exist
     existing_samples = []
-    for idx in range(start_sample, start_sample + num_samples):
+    for idx in range(num_samples):
         sample_filename = f"{save_name}_sample_{idx:06d}.h5"
         if os.path.exists(sample_filename):
             existing_samples.append(idx)
     
-    samples_to_generate = [idx for idx in range(start_sample, start_sample + num_samples) if idx not in existing_samples]
+    samples_to_generate = [idx for idx in range(num_samples) if idx not in existing_samples]
     
     if not samples_to_generate:
         logger.info(f"All {num_samples} samples already exist. Nothing to do.")
@@ -85,14 +84,14 @@ def generate_trajectories_smoke(
         smoke = abs(
             CenteredGrid(
                 Noise(scale=11.0, smoothness=6.0),
-                extrapolation.BOUNDARY,
+                extrapolation.PERIODIC,  # PERIODIC boundary conditions
                 x=pde.nx,
                 y=pde.ny,
                 bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly],
             )
         )  # sampled at cell centers
         velocity = StaggeredGrid(
-            0, extrapolation.ZERO, x=pde.nx, y=pde.ny, bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly]
+            0, extrapolation.PERIODIC, x=pde.nx, y=pde.ny, bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly]
         )  # sampled in staggered form at face centers
         fluid_field_ = []
         velocity_ = []
@@ -139,7 +138,7 @@ def generate_trajectories_smoke(
         # Generate random seeds only for the samples we need to create
         rngs = np.random.randint(np.iinfo(np.int32).max, size=len(samples_to_generate))
         # print("rngs", rngs, "rngs type", type(rngs),  rngs  [0].item(), "rngs[0] type", type(rngs[0].item()))
-        if not torch.cuda.is_available():
+        if torch.cuda.is_available():
             Parallel(n_jobs=n_parallel)(delayed(genfunc)(idx, rngs[i].item()) for i, idx in enumerate(tqdm(samples_to_generate)))
         else:
             for i, idx in enumerate(tqdm(samples_to_generate)):

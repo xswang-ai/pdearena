@@ -62,7 +62,6 @@ def main(cfg):
             dirname=cfg.dirname,
             n_parallel=cfg.parallel,
             seed=seed,
-            start_sample=getattr(cfg, 'start_sample', 0),
             tol=cfg.solve_rel_tol,
         )
     elif cfg.experiment == "smoke_cond":
