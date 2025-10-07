@@ -4,7 +4,7 @@
 #SBATCH --time=01:00:00
 #SBATCH --mem=64gb
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:0
 #SBATCH --ntasks-per-node=1
 #SBATCH --account=OD-230881
 #SBATCH --cpus-per-task=8       # cpu-cores per task (>1 if multi-threaded tasks)
