@@ -10,10 +10,10 @@ from matplotlib.animation import PillowWriter
 def load_sample(sample_path):
     var_list = ['u', 'vx', 'vy']
     with h5py.File(sample_path, 'r') as f:
-        sample = {var: f[var].value for var in var_list}
-        print("sample u .shape", sample['u'].shape)
-        print("sample vx.shape", sample['vx'].shape)
-        print("sample vy.shape", sample['vy'].shape)
+        sample = {var: f[var][:] for var in var_list}
+        print("sample u .shape", sample['u'].shape, sample['u'].dtype)
+        print("sample vx.shape", sample['vx'].shape, sample['vx'].dtype)
+        print("sample vy.shape", sample['vy'].shape, sample['vy'].dtype)
         print("sample.keys()", sample.keys())
     return sample
 
