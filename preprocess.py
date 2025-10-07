@@ -45,11 +45,13 @@ def generate_gt_gif(sample_data, log_path=None):
             data_c = sample_data[key]
             vmax = np.max(np.abs(data_c))
             vmin = -vmax if np.min(data_c) <0 else np.min(data_c)
-            imgs[key].set_data(data_c[frame_idx], vmin=vmin, vmax=vmax, cmap=cmap)
-            titles[key].set_title(key + ' T=' + str(frame_idx))
-        return imgs, titles
+            imgs[key].set_data(data_c[frame_idx])
+            imgs[key].set_clim(vmin=vmin, vmax=vmax)
+            titles[key].set_text(key + ' T=' + str(frame_idx))
+        # Don't return anything when blit=False
+        return []
 
-    anim = FuncAnimation(fig, update, frames=data_c.shape[0]-1, interval=200, blit=False)
+    anim = FuncAnimation(fig, update, frames=sample_data['u'].shape[0], interval=200, blit=False)
 
     gif_path = f'{log_path}/sample_{sample_id}.gif'
     try:
