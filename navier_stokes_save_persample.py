@@ -84,14 +84,18 @@ def generate_trajectories_smoke(
         smoke = abs(
             CenteredGrid(
                 Noise(scale=11.0, smoothness=6.0),
-                extrapolation.PERIODIC,  # PERIODIC boundary conditions
+                # extrapolation.PERIODIC,  # PERIODIC boundary conditions
+                extrapolation.BOUNDARY,
                 x=pde.nx,
                 y=pde.ny,
                 bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly],
             )
         )  # sampled at cell centers
         velocity = StaggeredGrid(
-            0, extrapolation.PERIODIC, x=pde.nx, y=pde.ny, bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly]
+            0, 
+            # extrapolation.PERIODIC,
+            extrapolation.BOUNDARY,
+             x=pde.nx, y=pde.ny, bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly]
         )  # sampled in staggered form at face centers
         fluid_field_ = []
         velocity_ = []
