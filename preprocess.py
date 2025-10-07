@@ -10,7 +10,7 @@ from matplotlib.animation import PillowWriter
 def load_sample(sample_path):
     var_list = ['u', 'vx', 'vy']
     with h5py.File(sample_path, 'r') as f:
-        sample = {var: f[var] for var in var_list}
+        sample = {var: f[var].value for var in var_list}
         print("sample u .shape", sample['u'].shape)
         print("sample vx.shape", sample['vx'].shape)
         print("sample vy.shape", sample['vy'].shape)
@@ -32,6 +32,7 @@ def generate_gt_gif(sample_data, log_path=None):
     imgs = {}
     for i, key in enumerate(keys):
         data_c = sample_data[key]
+        print("data_c.shape", data_c.shape)
         vmax = np.max(np.abs(data_c))
         vmin = -vmax if np.min(data_c) <0 else np.min(data_c)
         imgs[key] = ax[i].imshow(data_c[0], vmin=vmin, vmax=vmax, cmap=cmap)
