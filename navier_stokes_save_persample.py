@@ -100,21 +100,25 @@ def generate_trajectories_smoke(
         fluid_field_ = []
         velocity_ = []
         print(f"Solving with relative tolerance {tol}")
-        for i in tqdm(range(0, pde.nt + pde.skip_nt)):
-            smoke = advect.semi_lagrangian(smoke, velocity, pde.dt)
-            buoyancy_force = (smoke * (0, pde.buoyancy_y)).at(velocity)  # resamples smoke to velocity sample points
-            velocity = advect.semi_lagrangian(velocity, velocity, pde.dt) + pde.dt * buoyancy_force
-            velocity = diffuse.explicit(velocity, pde.nu, pde.dt)
-            velocity, _ = fluid.make_incompressible(velocity, solve=Solve(rel_tol=tol))
-            fluid_field_.append(reshaped_native(smoke.values, groups=("x", "y", "vector"), to_numpy=True))
-            velocity_.append(
-                reshaped_native(
-                    velocity.staggered_tensor(),
-                    groups=("x", "y", "vector"),
-                    to_numpy=True,
-                )
-            )
-
+        try:
+            for i in tqdm(range(0, pde.nt + pde.skip_nt)):
+                smoke = advect.semi_lagrangian(smoke, velocity, pde.dt)
+                buoyancy_force = (smoke * (0, pde.buoyancy_y)).at(velocity)  # resamples smoke to velocity sample points
+                velocity = advect.semi_lagrangian(velocity, velocity, pde.dt) + pde.dt * buoyancy_force
+                velocity = diffuse.explicit(velocity, pde.nu, pde.dt)
+                velocity, _ = fluid.make_incompressible(velocity, solve=Solve(rel_tol=tol))
+                fluid_field_.append(reshaped_native(smoke.values, groups=("x", "y", "vector"), to_numpy=True))
+                velocity_.append(
+                    reshaped_native(
+                        velocity.staggered_tensor(),
+                        groups=("x", "y", "vector"),
+                        to_numpy=True,
+                        )
+                    )
+        except Exception as e:
+            print(f"Managed to solve for sample {idx}, but there was an error: {str(e)}")
+            pde.sample_rate = 10 # reduce the sample rate to 10
+        
         fluid_field_ = np.asarray(fluid_field_[pde.skip_nt :]).squeeze()
         # velocity has the shape [nt, nx+1, ny+2, 2]
         velocity_corrected_ = np.asarray(velocity_[pde.skip_nt :]).squeeze()[:, :-1, :-1, :]
