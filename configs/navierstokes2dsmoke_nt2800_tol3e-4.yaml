@@ -12,7 +12,7 @@ pdeconfig:
     nx: 128 # spatial resolution on x-axis
     ny: 128 # spatial resolution on y-axis
     skip_nt: 8 # initial timesteps to ignore
-    sample_rate: 20 # sampling rate of data as a multiple of minumum dt
+    sample_rate: 100 # sampling rate of data as a multiple of minumum dt
     nu: 0.01 # viscosity
     buoyancy_y: 0.5 # bouyancy force in vertical direction
     correction_strength: 1.0
@@ -21,7 +21,7 @@ pdeconfig:
     n_scalar_components: 1
     n_vector_components: 1
     device: cpu
-solve_rel_tol: 1e-4
+solve_rel_tol: 3e-4
 parallel: 8
 samples: 2
 batchsize: 8

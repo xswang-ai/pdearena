@@ -12,7 +12,8 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-            "base=configs/navierstokes2dsmoke_nt5k_fy0.1.yaml",
+            // "base=configs/navierstokes2dsmoke_nt560_tol1e-3.yaml",
+            "base=configs/navierstokes2dsmoke_nt2800_tol3e-4.yaml",
             "experiment=smoke",
             "mode=train",
             "samples=2",

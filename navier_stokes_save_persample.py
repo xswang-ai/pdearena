@@ -95,6 +95,7 @@ def generate_trajectories_smoke(
         )  # sampled in staggered form at face centers
         fluid_field_ = []
         velocity_ = []
+        print(f"Solving with relative tolerance {tol}")
         for i in tqdm(range(0, pde.nt + pde.skip_nt)):
             smoke = advect.semi_lagrangian(smoke, velocity, pde.dt)
             buoyancy_force = (smoke * (0, pde.buoyancy_y)).at(velocity)  # resamples smoke to velocity sample points
