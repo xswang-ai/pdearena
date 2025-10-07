@@ -14,5 +14,5 @@
 module load pytorch/2.5.1-py312-cu122-mpi
 source $HOME/.venvs/pytorch/bin/activate
 
-python3 generate_data.py base=configs/navierstokes2dsmoke_nt5k_fy0.1.yaml  experiment=smoke mode=train samples=2  seed=197910 \
+python3 generate_data.py base=configs/navierstokes2dsmoke_nt560_tol1e-3.yaml  experiment=smoke mode=train samples=2  seed=197910 \
 dirname=/scratch3/wan410/operator_learning_data/pdearena/NSE-2D-Customised
