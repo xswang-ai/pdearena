@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script produces 5.2k training, 1.3k valid, and 1.3k test trajectories of the Navier-Stokes dataset.
 
-#SBATCH --time=30:00:00
+#SBATCH --time=00:30:00
 
 #SBATCH --mem=256gb
 #SBATCH --nodes=1
