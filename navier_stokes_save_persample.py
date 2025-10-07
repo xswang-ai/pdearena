@@ -94,7 +94,7 @@ def generate_trajectories_smoke(
         velocity = StaggeredGrid(
             0, 
             # extrapolation.PERIODIC,
-            extrapolation.BOUNDARY,
+            extrapolation.ZERO,
              x=pde.nx, y=pde.ny, bounds=Box['x,y', 0 : pde.Lx, 0 : pde.Ly]
         )  # sampled in staggered form at face centers
         fluid_field_ = []
