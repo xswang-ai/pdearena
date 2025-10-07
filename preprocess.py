@@ -19,7 +19,7 @@ def load_sample(sample_path):
 
 # load the sample
 load_path = '/scratch3/wan410/operator_learning_data/pdearena/NSE-2D-Customised'
-sample = load_sample(f'{load_path}/NavierStokes2D_train_198010_0.50000/tol0.00100_nt560_2_sample_000000.h5')
+sample = load_sample(f'{load_path}/NavierStokes2D_train_198010_0.50000/tol0.00030_nt5000_2_sample_000000.h5')
 # get nt  and tol 
 nt = 560
 tol = 1e-3
