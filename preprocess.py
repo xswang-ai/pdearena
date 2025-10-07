@@ -19,7 +19,7 @@ def load_sample(sample_path):
 
 # load the sample
 load_path = '/scratch3/wan410/operator_learning_data/pdearena/NSE-2D-Customised'
-sample = load_sample(f'{load_path}/NavierStokes2D_train_198010_0.50000_2_sample_000000.h5')
+sample = load_sample(f'{load_path}/NavierStokes2D_train_198010_0.10000_5000_sample_001241.h5')
 
 sample_id = 1000
 def generate_gt_gif(sample_data, log_path=None):
