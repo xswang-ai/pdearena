@@ -4,13 +4,24 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
+
         {
             "name": "Python Debugger: Current File",
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": "--config=config/FNO_Re1k.yaml"
+            "args": [
+            // "base=configs/navierstokes2dsmoke_nt560_tol1e-3.yaml",
+            "base=configs/navierstokes2dsmoke_nt2800_tol3e-4.yaml",
+            "experiment=smoke",
+            "mode=train",
+            "samples=2",
+            "seed=197910",
+            "dirname=pdearena_data/navierstokes/",
+            "dirname=pdearena_data/navierstokes/",
+        ]
         }
     ]
 }
