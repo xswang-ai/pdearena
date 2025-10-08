@@ -430,9 +430,9 @@ class McWilliams2DDataset(Dataset):
         # Load the data
         raw_data = torch.load(self.file_path, map_location='cpu')  # Shape: (1000, 128, 128, 30, 2)
         vorticity = raw_data['vorticity'][0].squeeze().numpy()
-        vorticity = np.transpose(vorticity, (1, 2, 0)).expand_dims(-1)  # (128, 128, 30, 1)
+        vorticity = np.expand_dims(np.transpose(vorticity, (1, 2, 0)), -1)  # (128, 128, 30, 1)
         stream = raw_data['stream'][0].squeeze().numpy()
-        stream = np.transpose(stream, (1, 2, 0)).expand_dims(-1)  # (128, 128, 30, 1)
+        stream = np.expand_dims(np.transpose(stream, (1, 2, 0)), -1)  # (128, 128, 30, 1)
         raw_data = np.stack([vorticity, stream], axis=-1)
         # Convert to numpy for processing
         if isinstance(raw_data, torch.Tensor):
