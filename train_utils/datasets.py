@@ -439,7 +439,7 @@ class McWilliams2DDataset(Dataset):
         if isinstance(raw_data, torch.Tensor):
             raw_data = raw_data.numpy()
         print(f"Raw data shape: {raw_data.shape}")
-        
+        # raw_data = torch.rand(10, 128, 128, 30, 2).numpy()
         # Subsample spatial dimensions if needed
         sub_h = self.raw_res[0] // self.data_res[0]
         sub_w = self.raw_res[1] // self.data_res[1]
@@ -471,6 +471,7 @@ class McWilliams2DDataset(Dataset):
         self.a_data = a_data
         
         # Create grid for PDE loss (spatial coordinates + time)
+        print(f"PDE resolution: {self.pde_res}")
         H, W = self.pde_res
         gridx, gridy, gridt = get_grid3d(H, self.T)
         self.grid = torch.cat((gridx[0], gridy[0], gridt[0]), dim=-1)  # (H, W, T, 3)
