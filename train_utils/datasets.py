@@ -429,7 +429,7 @@ class McWilliams2DDataset(Dataset):
         
         # Load the data
         raw_data = torch.load(self.file_path, map_location='cpu')  # Shape: (1000, 128, 128, 30, 2)
-        
+        print(f"Raw data shape: {raw_data.shape}")
         # Convert to numpy for processing
         if isinstance(raw_data, torch.Tensor):
             raw_data = raw_data.numpy()
