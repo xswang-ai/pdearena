@@ -23,7 +23,7 @@ def test_dataset_integration():
         'file_path': '/scratch3/wan410/operator_learning_data/NS_torchcfd/data/McWilliams2d_128x128_N1000_Re5000_T30.pt',
         'raw_res': [128, 128, 30],
         'data_res': [128, 128, 30],
-        'pde_res': [128, 128, 30],
+        'pde_res': [128, 128],
         'n_samples': 10,  # Small number for testing
         'offset': 0,
         't_duration': 1.0
